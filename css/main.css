@@ -1,0 +1,19 @@
+.header {
+  display: block;
+  text-align: center;
+}
+
+.accent {
+  color: #ff0057;
+}
+
+body {
+  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
+  line-height: 1.6;
+  font-weight: 400;
+  font-family: 'Share', cursive;
+  color: #222; }
+
+code {
+  font-family: 'Cutive Mono', monospace;
+}
