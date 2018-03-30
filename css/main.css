@@ -1,19 +1,45 @@
 .header {
-  display: block;
   text-align: center;
-}
-
-.accent {
-  color: #ff0057;
 }
 
 body {
   font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
   font-weight: 400;
-  font-family: 'Share', cursive;
-  color: #222; }
+  font-family: "Share", cursive;
+  color: #222;
+}
 
 code {
-  font-family: 'Cutive Mono', monospace;
+  font-family: "Cutive Mono", monospace;
+}
+
+a {
+  color: #ff80ab;
+}
+a:hover {
+  color: #ff0057;
+}
+
+th {
+  border-bottom-color: #ff0057;
+}
+td {
+  border-bottom-color: #ffccdd;
+}
+
+tr:hover {
+  background-color: #fff2f7;
+}
+
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #ff0057;
 }

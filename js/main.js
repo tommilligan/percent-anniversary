@@ -1,6 +1,8 @@
 var colorPrimary = "#FF0057";
 var colorPrimary50 = "#FF80AB";
+var colorPrimary20 = "#FFCCDD";
 var colorPrimary10 = "#FFE6EE";
+var colorPrimary5 = "#FFF2F7";
 
 var formatDateString = "YYYY-MM-DD";
 
@@ -34,11 +36,12 @@ function removeElementChildren(el) {
 /**
  * Convert an array of string to a table row element
  * @param {string[]} rowData
+ * @param {boolean} header
  */
-function createTableRow(rowData) {
+function createTableRow(rowData, header) {
   var row = document.createElement("tr");
   rowData.forEach(function(cellData) {
-    var cell = document.createElement("td");
+    var cell = document.createElement(header ? "th" : "td");
     cell.appendChild(document.createTextNode(cellData));
     row.appendChild(cell);
   });
@@ -57,8 +60,9 @@ function createTable(tableData, tableHeaderData) {
 
   if (tableHeaderData) {
     var tableHeader = document.createElement("thead");
-    var head = createTableRow(tableHeaderData);
-    table.appendChild(head);
+    var head = createTableRow(tableHeaderData, true);
+    tableHeader.appendChild(head);
+    table.appendChild(tableHeader);
   }
 
   var tableBody = document.createElement("tbody");
