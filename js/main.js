@@ -2,20 +2,39 @@ var colorPrimary = "#FF0057";
 var colorPrimary50 = "#FF80AB";
 var colorPrimary10 = "#FFE6EE";
 
+var formatDateString = "YYYY-MM-DD";
+
+/**
+ * Convert milliseconds to years
+ * @param {number} ms
+ */
 function msToYears(ms) {
   return ms / 31536000000;
 }
 
+/**
+ * Check if initialising a new object was successful
+ * @param {Moment | null} m
+ */
 function isValidMoment(m) {
   return !(m === null || !m.isValid());
 }
 
+/**
+ * Remove all children from a DOM node, such as
+ * given by document.getElementId
+ * @param {DOMNode} el
+ */
 function removeElementChildren(el) {
   while (el.firstChild) {
     el.removeChild(el.firstChild);
   }
 }
 
+/**
+ * Convert an array of string to a table row element
+ * @param {string[]} rowData
+ */
 function createTableRow(rowData) {
   var row = document.createElement("tr");
   rowData.forEach(function(cellData) {
@@ -26,6 +45,12 @@ function createTableRow(rowData) {
   return row;
 }
 
+/**
+ * Convert a 2D array to a table element. Optionally
+ * add a header row as well
+ * @param {Array<Array<string>>} tableData
+ * @param {Array<string>} tableHeaderData
+ */
 function createTable(tableData, tableHeaderData) {
   var table = document.createElement("table");
   table.className = "u-full-width";
@@ -46,7 +71,7 @@ function createTable(tableData, tableHeaderData) {
 }
 
 /**
- * Redraw data to page
+ * Redraw data to page (mutative)
  * @param {Moment} birthdayDate
  * @param {Moment} relationshipDate
  * @param {boolean} useDates
@@ -55,7 +80,7 @@ function redraw(birthdayDate, relationshipDate, useDates) {
   function ageToDate(d) {
     var date = moment(birthdayDate)
       .add(d, "years")
-      .format("YYYY-MM-DD");
+      .format(formatDateString);
     return date;
   }
 
@@ -94,12 +119,12 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  var x = d3
+  // Data to pixel scales
+  var xScale = d3
     .scaleLinear()
     .domain([0, 100])
     .range([0, width]);
-
-  var y = d3
+  var yScale = d3
     .scaleLinear()
     .domain([0, 100])
     .rangeRound([height, 0]);
@@ -108,10 +133,10 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     .line()
     .curve(d3.curveBasis)
     .x(function(d) {
-      return x(d.date);
+      return xScale(d.date);
     })
     .y(function(d) {
-      return y(d.close);
+      return yScale(d.close);
     });
 
   var data = [];
@@ -124,13 +149,13 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     });
   }
 
-  console.log(data);
-
   var timeUnitAxis = timeUnit ? " (" + timeUnit + ")" : "";
+
+  // x axis
   g
     .append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x).tickFormat(timeFormatter))
+    .call(d3.axisBottom(xScale).tickFormat(timeFormatter))
     .append("text")
     .attr("fill", "#000")
     .attr("x", width)
@@ -138,9 +163,10 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     .attr("text-anchor", "end")
     .text("Time" + timeUnitAxis);
 
+  // y axis
   g
     .append("g")
-    .call(d3.axisLeft(y))
+    .call(d3.axisLeft(yScale))
     .append("text")
     .attr("fill", "#000")
     .attr("transform", "rotate(-90)")
@@ -149,6 +175,7 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     .attr("text-anchor", "end")
     .text("Percent");
 
+  // Graph line
   g
     .append("path")
     .datum(data)
@@ -159,20 +186,27 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     .attr("stroke-width", 1.5)
     .attr("d", line);
 
-  var focus = g.append("g").style("display", "none");
+  // Annotations on the line
+  var annotations = g.append("g").style("opacity", 0.4);
 
+  /**
+   * Focus element consits of a:
+   * - pointer
+   * - text description
+   */
+  var focus = g.append("g").style("display", "none");
   focus
     .append("circle")
     .attr("r", 4.5)
     .style("fill", "none")
     .style("stroke", colorPrimary);
-
   focus
     .append("text")
     .attr("x", 9)
     .attr("y", 14)
     .style("font-size", "10px");
 
+  // Element to listen for mouse events
   g
     .append("rect")
     .style("fill", "none")
@@ -187,6 +221,11 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     })
     .on("mousemove", mousemove);
 
+  /**
+   * Generate text for the focus from coordinates
+   * @param {number} x0
+   * @param {number} y0
+   */
   function focusText(x0, y0) {
     return (
       "(" +
@@ -201,16 +240,15 @@ function redraw(birthdayDate, relationshipDate, useDates) {
   var keyPercents = [5, 10, 20, 32.5, 50, 75];
   keyPercents.forEach(function(percent) {
     var time = timeFromPercent(percent);
-    var x0 = x(time);
-    var y0 = y(percent);
-    var note = g.append("g").style("opacity", 0.4);
-    note
+    var x0 = xScale(time);
+    var y0 = yScale(percent);
+    annotations
       .append("circle")
       .attr("fill", colorPrimary)
       .attr("cx", x0)
       .attr("cy", y0)
       .attr("r", 3);
-    note
+    annotations
       .append("text")
       .attr("x", x0 + 9)
       .attr("y", y0 + 14)
@@ -218,16 +256,15 @@ function redraw(birthdayDate, relationshipDate, useDates) {
       .text(focusText(time, percent));
   });
 
-  var bisectDate = d3.bisector(function(d) {
-    return d.date;
-  }).left;
-
+  /**
+   * On mouse, move focus element over the graph
+   */
   function mousemove() {
     var mouse = d3.mouse(this);
-    var x0 = x.invert(mouse[0]);
+    var x0 = xScale.invert(mouse[0]);
     x0 = x0 > timeRelationship ? x0 : timeRelationship;
     var y0 = percentFromTime(x0);
-    focus.attr("transform", "translate(" + x(x0) + "," + y(y0) + ")");
+    focus.attr("transform", "translate(" + xScale(x0) + "," + yScale(y0) + ")");
     focus.select("text").text(focusText(x0, y0));
   }
 
@@ -239,10 +276,13 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     }
   );
 
-  var table = createTable(tableData, ["Percent", "Age", "Date"]);
+  var table = createTable(tableData, ["%", "Age (years)", "Date"]);
   mountTable.appendChild(table);
 }
 
+/**
+ * Load user inputs from the DOM, and decide whether to redraw
+ */
 function update() {
   var now = Date.now();
   var birthday = document.getElementById("birthday").value;
@@ -250,14 +290,17 @@ function update() {
   var unitsFormat = document.getElementById("unitsFormat").value;
   var useDates = unitsFormat === "date";
 
-  var birthdayDate = moment(birthday, "YYYY-MM-DD");
-  var relationshipDate = moment(relationship, "YYYY-MM-DD");
+  var birthdayDate = moment(birthday, formatDateString);
+  var relationshipDate = moment(relationship, formatDateString);
   if (isValidMoment(birthdayDate) && isValidMoment(relationshipDate)) {
     redraw(birthdayDate, relationshipDate, useDates);
   }
 }
 
+// Load default values
 update();
+
+// Add listeners to respond to events
 document.getElementById("birthday").addEventListener("change", update);
 document.getElementById("relationship").addEventListener("change", update);
 document.getElementById("unitsFormat").addEventListener("change", update);
