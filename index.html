@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
   <!-- Basic Page Needs
@@ -29,24 +30,51 @@
 
   <!-- JS CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
 
 </head>
+
 <body>
 
   <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <div class="container">
     <div class="header" style="margin-top: 20px">
-      <h4 class="title">Basic Page</h4>
-      <p>This index.html page is a placeholder with the CSS, font and favicon. It's just waiting for you to add some content! If you need some help hit up the <a href="http://www.getskeleton.com">Skeleton documentation</a>.</p>
+      <h4 class="title">How much of your life have you shared?</h4>
+    </div>
+    <div class="row">
+      <form>
+        <div class="row">
+          <div class="four columns">
+            <label for="birthday">Your birthday</label>
+            <input class="u-full-width" value="1990-01-01" type="text" placeholder="YYYY-MM-YY" id="birthday">
+          </div>
+          <div class="four columns">
+            <label for="relationship">Relationship start date</label>
+            <input class="u-full-width" value="2010-07-14" type="text" placeholder="YYYY-MM-YY" id="relationship">
+          </div>
+          <div class="four columns">
+            <label for="unitsFormat">Display</label>
+            <select class="u-full-width" id="unitsFormat">
+              <option value="age">Age (years)</option>
+              <option value="date">Date</option>
+            </select>
+          </div>
+        </div>
+      </form>
     </div>
     <div class="row">
       <svg width="100%" height="500" id="mount" style="overflow: visible"></svg>
     </div>
+    <div class="row" id="mountTable" style="padding: 0 10px; background-color: #FFE6EE">
+    </div>
   </div>
+
+  <!-- Load D3 script after all HTML elements in place -->
   <script type="text/javascript" src="js/main.js"></script>
 
-<!-- End Document
+  <!-- End Document
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 </body>
+
 </html>
