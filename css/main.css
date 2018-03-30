@@ -27,6 +27,14 @@ th {
 td {
   border-bottom-color: #ffccdd;
 }
+th:first-child,
+td:first-child {
+  padding: 12px 15px;
+}
+th:last-child,
+td:last-child {
+  padding: 12px 15px;
+}
 
 tr:hover {
   background-color: #fff2f7;
