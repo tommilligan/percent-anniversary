@@ -15,6 +15,14 @@ function msToYears(ms) {
 }
 
 /**
+ * Convert years to milliseconds
+ * @param {number} years
+ */
+function yearsToMs(years) {
+  return years * 31536000000;
+}
+
+/**
  * Check if initialising a new object was successful
  * @param {Moment | null} m
  */
@@ -81,9 +89,11 @@ function createTable(tableData, tableHeaderData) {
  * @param {boolean} useDates
  */
 function redraw(birthdayDate, relationshipDate, useDates) {
-  function ageToDate(d) {
+  function ageToDate(years) {
+    // Have to convert to ms first, as moment only adds integers
+    var ms = yearsToMs(years);
     var date = moment(birthdayDate)
-      .add(d, "years")
+      .add(ms, "ms")
       .format(formatDateString);
     return date;
   }
@@ -133,6 +143,7 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     .domain([0, 100])
     .rangeRound([height, 0]);
 
+  // Line data
   var line = d3
     .line()
     .curve(d3.curveBasis)
@@ -145,7 +156,8 @@ function redraw(birthdayDate, relationshipDate, useDates) {
 
   var data = [];
 
-  for (i = timeRelationship; i < 101; i++) {
+  // Generate a set of points we can smooth to form a curve
+  for (i = timeRelationship; i < 101; i = i + 0.1) {
     var p = percentFromTime(i);
     data.push({
       date: i,
