@@ -111,7 +111,7 @@ function redraw(birthdayDate, relationshipDate, useDates) {
   var timeRelationship = msToYears(relationshipMs);
 
   function percentFromTime(t) {
-    return (t - timeRelationship) / (t - timeBirth) * 100;
+    return ((t - timeRelationship) / (t - timeBirth)) * 100;
   }
   function timeFromPercent(p) {
     var r = p / 100;
@@ -168,8 +168,7 @@ function redraw(birthdayDate, relationshipDate, useDates) {
   var timeUnitAxis = timeUnit ? " (" + timeUnit + ")" : "";
 
   // x axis
-  g
-    .append("g")
+  g.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(xScale).tickFormat(timeFormatter))
     .append("text")
@@ -180,8 +179,7 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     .text("Time" + timeUnitAxis);
 
   // y axis
-  g
-    .append("g")
+  g.append("g")
     .call(d3.axisLeft(yScale))
     .append("text")
     .attr("fill", "#000")
@@ -192,8 +190,7 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     .text("Percent");
 
   // Graph line
-  g
-    .append("path")
+  g.append("path")
     .datum(data)
     .attr("fill", "none")
     .attr("stroke", colorPrimary)
@@ -223,8 +220,7 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     .style("font-size", "10px");
 
   // Element to listen for mouse events
-  g
-    .append("rect")
+  g.append("rect")
     .style("fill", "none")
     .style("pointer-events", "all")
     .attr("width", width)
@@ -284,13 +280,34 @@ function redraw(birthdayDate, relationshipDate, useDates) {
     focus.select("text").text(focusText(x0, y0));
   }
 
-  // Redraw table
-  var tableData = [1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 99].map(
-    function(percent) {
+  // Redraw table with percentage intervals
+  var tableData = [
+    1,
+    2,
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    40,
+    50,
+    60,
+    70,
+    75,
+    80,
+    85,
+    90,
+    95
+  ]
+    .map(function(percent) {
       var time = timeFromPercent(percent);
       return [percent, time.toFixed(1), ageToDate(time)];
-    }
-  );
+    })
+    // filter out ages over a silly amount
+    .filter(function(datum) {
+      return datum[1] < 150;
+    });
 
   var table = createTable(tableData, ["%", "Age (years)", "Date"]);
   mountTable.appendChild(table);
